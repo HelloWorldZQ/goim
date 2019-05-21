@@ -1,6 +1,6 @@
 # This is a TOML document. Boom
 [discovery]
-    nodes = ["127.0.0.1:7171"]
+    nodes = ["10.100.55.79:7171"]
 
 [rpcServer]
     addr = ":3109"
@@ -38,7 +38,7 @@
 
 [whitelist]
     Whitelist = [123]
-    WhiteLog  = "/tmp/white_list.log"
+    WhiteLog  = "white_list.log"
 
 [bucket]
     size = 32

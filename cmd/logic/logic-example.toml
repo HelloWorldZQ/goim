@@ -1,6 +1,6 @@
 # This is a TOML document. Boom
 [discovery]
-    nodes = ["127.0.0.1:7171"]
+    nodes = ["10.100.55.79:7171"]
 
 [regions]
     "bj" = ["北京","天津","河北","山东","山西","内蒙古","辽宁","吉林","黑龙江","甘肃","宁夏","新疆"]
@@ -40,11 +40,12 @@
 
 [kafka]
     topic = "goim-push-topic"
-    brokers = ["127.0.0.1:9092"]
+    brokers = ["10.100.55.62:9092","10.100.55.63:9092","10.100.55.64:9092"]
 
 [redis]
     network = "tcp"
-    addr = "127.0.0.1:6379"
+    addr = "10.100.55.79:6379"
+    auth = "health_123"
     active = 60000
     idle = 1024
     dialTimeout = "200ms"

@@ -16,6 +16,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"strings"
 	"sync/atomic"
 	"time"
 
@@ -161,6 +162,74 @@ func startClient(key int64) {
 			}
 		}
 	}()
+
+	// writer
+	go func() {
+		hbProto := new(Proto)
+
+		//功能一：客户端可以发送单行数据，然后退出
+		reader := bufio.NewReader(os.Stdin) //os.Stdin 代表标准输入【终端】
+		for {
+			//从终端读取一行输入，并准备发送给服务器
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Println("终端读取失败，err ：", err)
+				return
+			}
+			line = strings.Trim(line, " \r\n")
+			if line == "exit" {
+				fmt.Println("客户端退出....")
+				break
+			}
+			//再将读取的发送给服务器
+			//_, err = conn.Write([]byte(line + "\n"))
+
+			// heartbeat
+			hbProto.Operation = 1000
+			hbProto.Seq = seq
+			hbProto.Body = []byte(line)
+			if err = tcpWriteProto(wr, hbProto); err != nil {
+				log.Errorf("key:%d tcpWriteProto() error(%v)", key, err)
+				return
+			}
+			log.Infof("key:%d Write heartbeat", key)
+			time.Sleep(heart)
+			seq++
+			select {
+			case <-quit:
+				return
+			default:
+			}
+
+			if err != nil {
+				fmt.Println("conn Write err:", err)
+			}
+			if err == nil {
+				fmt.Println("send:", line)
+			}
+
+		}
+
+		for {
+			// heartbeat
+			hbProto.Operation = opHeartbeat
+			hbProto.Seq = seq
+			hbProto.Body = nil
+			if err = tcpWriteProto(wr, hbProto); err != nil {
+				log.Errorf("key:%d tcpWriteProto() error(%v)", key, err)
+				return
+			}
+			log.Infof("key:%d Write heartbeat", key)
+			time.Sleep(heart)
+			seq++
+			select {
+			case <-quit:
+				return
+			default:
+			}
+		}
+	}()
+
 	// reader
 	for {
 		if err = tcpReadProto(rd, proto); err != nil {
