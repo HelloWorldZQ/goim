@@ -184,32 +184,20 @@ func startClient(key int64) {
 			//再将读取的发送给服务器
 			//_, err = conn.Write([]byte(line + "\n"))
 
-			// heartbeat
+			// heartbeat22
 			hbProto.Operation = 1000
 			hbProto.Seq = seq
 			hbProto.Body = []byte(line)
 			if err = tcpWriteProto(wr, hbProto); err != nil {
-				log.Errorf("key:%d tcpWriteProto() error(%v)", key, err)
+				fmt.Println("key:%d tcpWriteProto() error(%v)", key, err)
 				return
 			}
 			log.Infof("key:%d Write heartbeat", key)
-			time.Sleep(heart)
-			seq++
-			select {
-			case <-quit:
-				return
-			default:
-			}
-
-			if err != nil {
-				fmt.Println("conn Write err:", err)
-			}
 			if err == nil {
 				fmt.Println("send:", line)
 			}
-
+			seq++
 		}
-
 		for {
 			// heartbeat
 			hbProto.Operation = opHeartbeat
@@ -248,6 +236,7 @@ func startClient(key int64) {
 			}
 		} else {
 			log.Infof("key:%d op:%d msg: %s", key, proto.Operation, string(proto.Body))
+			fmt.Println(fmt.Sprintf("key:%d op:%d msg: %s", key, proto.Operation, string(proto.Body)))
 			atomic.AddInt64(&countDown, 1)
 		}
 	}

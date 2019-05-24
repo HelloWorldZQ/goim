@@ -2,6 +2,7 @@ package comet
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	model "github.com/Terry-Mao/goim/api/comet/grpc"
@@ -82,6 +83,22 @@ func (s *Server) Operate(ctx context.Context, p *model.Proto, ch *Channel, b *Bu
 			ch.UnWatch(ops...)
 		}
 		p.Op = model.OpUnsubReply
+	case int32(1000):
+		//b.Broadcast(p,p.Op);
+
+		go func() {
+			for _, bucket := range s.buckets {
+				fmt.Println(string(p.Body))
+				bucket.Broadcast(p, p.Op)
+				if p.Seq > 0 {
+					t := bucket.ChannelCount() / int(p.Seq)
+					time.Sleep(time.Duration(t) * time.Second)
+				}
+
+			}
+		}()
+		return nil
+
 	default:
 		// TODO ack ok&failed
 		if err := s.Receive(ctx, ch.Mid, p); err != nil {
