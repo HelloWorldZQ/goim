@@ -137,3 +137,7 @@ job 根据kafka的partition来扩展多job工作方式，具体可以参考下ka
 
 ##更多
 TODO
+
+
+####grpc proto 构建命令
+    protoc -I=. -I=$GOPATH/src -I=$GOPATH/src/github.com/gogo/protobuf/protobuf --gofast_out=plugins=grpc:. ./api.proto
