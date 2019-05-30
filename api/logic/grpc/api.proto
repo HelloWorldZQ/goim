@@ -109,7 +109,8 @@ message Backoff {
 	float	Factor = 3 [(gogoproto.jsontag) = "factor"];
 	float	Jitter = 4 [(gogoproto.jsontag) = "jitter"];
 }
-
+message PushReply {
+}
 service Logic {
     // Ping Service 
     rpc Ping(PingReq) returns(PingReply);
@@ -127,4 +128,6 @@ service Logic {
     rpc Receive(ReceiveReq) returns (ReceiveReply);
 	//ServerList
 	rpc Nodes(NodesReq) returns (NodesReply);
+    //psuh msg
+    rpc Push(PushMsg) returns (PushReply);
 }

@@ -20,9 +20,9 @@ func New(c *conf.RPCServer, l *logic.Logic) *grpc.Server {
 	keepParams := grpc.KeepaliveParams(keepalive.ServerParameters{
 		MaxConnectionIdle:     time.Duration(c.IdleTimeout),
 		MaxConnectionAgeGrace: time.Duration(c.ForceCloseWait),
-		Time:             time.Duration(c.KeepAliveInterval),
-		Timeout:          time.Duration(c.KeepAliveTimeout),
-		MaxConnectionAge: time.Duration(c.MaxLifeTime),
+		Time:                  time.Duration(c.KeepAliveInterval),
+		Timeout:               time.Duration(c.KeepAliveTimeout),
+		MaxConnectionAge:      time.Duration(c.MaxLifeTime),
 	})
 	srv := grpc.NewServer(keepParams)
 	pb.RegisterLogicServer(srv, &server{l})
@@ -100,4 +100,12 @@ func (s *server) Receive(ctx context.Context, req *pb.ReceiveReq) (*pb.ReceiveRe
 // nodes return nodes.
 func (s *server) Nodes(ctx context.Context, req *pb.NodesReq) (*pb.NodesReply, error) {
 	return s.srv.NodesWeighted(ctx, req.Platform, req.ClientIP), nil
+}
+
+func (s *server) Push(ctx context.Context, req *pb.PushMsg) (*pb.PushReply, error) {
+	err := s.srv.PushAll(ctx, req.Operation, req.Speed, req.Msg)
+	if err != nil {
+		return &pb.PushReply{}, err
+	}
+	return &pb.PushReply{}, nil
 }
